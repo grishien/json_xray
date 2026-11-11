@@ -1,184 +1,61 @@
-<!-- PROJECT LOGO -->
-<p align="center">
-  <a href="https://github.com/AykutSarac/jsoncrack.com">
-   <img src="./apps/www/public/assets/192.png" height="50" alt="Logo">
-  </a>
+# JSON-Xray
 
-  <h1 align="center">JSON Crack</h1>
+Portable Windows desktop app for interactive JSON/YAML/XML/CSV visualization, formatting, conversion and export.
 
-  <p align="center">
-    The open-source JSON Editor.
-    <br />
-    <a href="https://jsoncrack.com"><strong>Learn more »</strong></a>
-    <br />
-    <br />
-    <a href="https://todiagram.com?utm_source=jsoncrack&utm_medium=readme_header">ToDiagram</a>
-    ·
-    <a href="https://discord.gg/yVyTtCRueq">Discord</a>
-    ·
-    <a href="https://jsoncrack.com">Website</a>
-    ·
-    <a href="https://github.com/AykutSarac/jsoncrack.com/issues">Issues</a>
-    ·
-    <a href="https://marketplace.visualstudio.com/items?itemName=AykutSarac.jsoncrack-vscode">VS Code</a>
-    ·
-    <a href="https://chromewebstore.google.com/detail/hbaeglefdflnhodchjiaphmheaojikhh">Chrome</a>
-  </p>
-</p>
+JSON-Xray renders JSON, YAML, XML and CSV as an interactive graph you can explore, format, validate, convert and export. It is built with Tauri (Rust + system WebView2) and React + TypeScript (Vite), with jsoncrack-react as the canvas engine.
 
-<!-- ABOUT THE PROJECT -->
+![JSON-Xray screenshot](docs/screenshot.png)
 
-## About the Project
+## Download
 
-<img width="100%" alt="JSON Crack editor" src="./apps/www/public/assets/editor.webp">
+1. Download the latest `json-xray-vX.Y.Z-portable-win64.exe` from [GitHub Releases](../../releases).
+2. Put it in any folder — it is a single self-contained executable: no installer, no admin rights, no external DLLs.
+3. Run it.
 
-## Visualize JSON into interactive graphs
+Optional: to add JSON-Xray to the Explorer "Open with" menu for `.json` and other supported files, keep the executable named `json-xray.exe` and double-click `json-xray-install.reg` from `apps/desktop/portable/` (undo with `json-xray-uninstall.reg`; see the README in that folder for details).
 
-JSON Crack is a tool for visualizing JSON data in a structured, interactive graphs, making it easier to explore, format, and validate JSON. It offers features like converting JSON to other formats (CSV, YAML), generating JSON Schema, executing queries, and exporting visualizations as images. Designed for both readability and usability.
+## Features
 
-* **Visualizer**: Instantly convert JSON, YAML, CSV, and XML into interactive graphs or trees in dark or light mode.
-* **Convert**: Seamlessly transform data formats, like JSON to CSV or XML to JSON, for easy sharing.
-* **Format & Validate**: Beautify and validate JSON, YAML, and CSV for clear and accurate data.
-* **Code Generation**: Generate TypeScript interfaces, Golang structs, Kotlin data classes, Rust serde types, and JSON Schema.
-* **JSON Schema**: Create and validate JSON Schema.
-* **Advanced Tools**: Run jq and JSON path queries.
-* **Export Image**: Download your visualization as PNG, JPEG, or SVG.
-* **Privacy**: All data processing is local; nothing is stored on our servers.
+- Interactive graph for JSON, YAML, XML and CSV
+- Zoom and pan
+- Collapsible nodes
+- Dark and light theme
+- Formatting (pretty-print) and validation with error highlighting
+- Conversion between JSON, YAML, XML and CSV
+- Graph export to PNG, JPEG and SVG
+- Open and save files via native dialogs
+- Drag-and-drop files into the window
+- Fully local data processing — no network access
 
-## Recognition
+## Platform
 
-<a href="https://news.ycombinator.com/item?id=32626873">
-  <img
-    style="width: 250px; height: 54px;" width="250" height="54"
-    alt="Featured on Hacker News"
-    src="https://hackernews-badge.vercel.app/api?id=32626873"
-  />
-</a>
+- **Windows 11 only.** The WebView2 runtime is taken from the operating system, so Windows 10 is not supported.
 
-<a href="https://producthunt.com/posts/JSON-Crack?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-jsoncrack" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=332281&theme=light" alt="JSON Crack | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+## Build
 
-## Integrations
-
-- [VS Code Extension](https://marketplace.visualstudio.com/items?itemName=AykutSarac.jsoncrack-vscode)
-- [Chrome Extension](https://chromewebstore.google.com/detail/hbaeglefdflnhodchjiaphmheaojikhh)
-- [npm Package (`jsoncrack-react`)](https://www.npmjs.com/package/jsoncrack-react)
-
-## Contributing
-
-- Found a bug or missing feature? Open an issue on [GitHub Issues](https://github.com/AykutSarac/jsoncrack.com/issues).
-- Want to contribute code or docs? Start with our [contribution guide](./CONTRIBUTING.md).
-
-## Sponsors & Support
-
-If you find JSON Crack useful, you can support the project by using [ToDiagram](https://todiagram.com?utm_source=jsoncrack&utm_medium=readme_sponsors). For sponsorship inquiries, reach out at contact@todiagram.com.
-
-## Stay Up-to-Date
-
-JSON Crack officially launched as v1.0 on the 17th of February 2022 and we've come a long way so far. Watch **releases** of this repository to be notified of future updates:
-
-<a href="https://github.com/AykutSarac/jsoncrack.com"><img src="https://img.shields.io/github/stars/AykutSarac/jsoncrack.com" alt="Star at GitHub" /></a>
-
-<!-- GETTING STARTED -->
-
-## Getting Started
-
-To get a local copy up and running, please follow these simple steps.
-
-### Prerequisites
-
-Here is what you need to be able to run JSON Crack.
-
-- Node.js (Version: >=24.x)
-- pnpm (Version: >=10)
-
-
-## Development
-
-### Setup
-
-1. Clone the repo into a public GitHub repository (or fork https://github.com/AykutSarac/jsoncrack.com/fork). If you plan to distribute the code, read the [`LICENSE`](/LICENSE.md) for additional details.
-
-   ```sh
-   git clone https://github.com/AykutSarac/jsoncrack.com.git
-   ```
-
-2. Go to the project folder
-
-   ```sh
-   cd jsoncrack.com
-   ```
-
-3. Install packages
-
-   ```sh
-   pnpm install
-   ```
-
-4. Run the web app
-
-   ```sh
-   pnpm dev:www
-
-   # Running on http://localhost:3000/
-   ```
-
-### Useful Commands
-
-From repository root:
+Prerequisites: Node.js >= 24, pnpm >= 10, Rust toolchain (stable, MSVC target).
 
 ```sh
-# Web app
-pnpm dev:www
-pnpm build:www
+pnpm install
 
-# VS Code extension
-pnpm dev:vscode
-pnpm build:vscode
-pnpm lint:vscode
-pnpm lint:fix:vscode
+# development
+cd apps/desktop
+pnpm tauri dev
 
-# Chrome extension
-pnpm dev:chrome
-pnpm build:chrome
-pnpm lint:chrome
-
-# All workspaces
-pnpm dev
-pnpm build
-pnpm lint
+# production build: single portable exe, no installer bundle
+pnpm tauri build --no-bundle
 ```
 
-### Debug VS Code Extension
+The resulting executable is written to `apps/desktop/src-tauri/target/release/desktop.exe`. It is fully portable and can be renamed and shipped as is.
 
-1. Open repository root in VS Code.
-2. Press `F5`.
-3. Select `Run VSCode Extension (apps/vscode)` when prompted.
-4. In the Extension Development Host window, open a `.json` file and run:
-   `JSON Crack: Enable JSON Crack visualization`.
+## Privacy
 
-### Docker
+All data is processed locally on your machine. JSON-Xray makes no network requests and collects no telemetry — your files never leave your computer.
 
-🐳 Docker assets are in `apps/www`.
-If you want to run JSON Crack locally:
+## Credits
 
-```console
-cd apps/www
-
-# Build a Docker image with:
-docker compose build
-
-# Run locally with docker compose
-docker compose up
-
-# Go to http://localhost:8888
-```
-
-## Configuration
-
-The supported node limit can be changed by editing `NEXT_PUBLIC_NODE_LIMIT` in `apps/www/.env`.
-
-<!-- LICENSE -->
+Visualization engine powered by the open-source jsoncrack-react package (MIT).
 
 ## License
 
-See [`LICENSE`](/LICENSE.md) for more information.
+Distributed under the MIT license. See [`LICENSE`](LICENSE.md) for details.
