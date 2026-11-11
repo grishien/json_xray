@@ -119,12 +119,22 @@ body {
   background: var(--app-panel);
 }
 
-.textarea {
+/* Редактор: textarea лежит поверх «зеркала»-pre с подсветкой ошибок
+   (Фаза 4, п. 4.1). Текст textarea прозрачен — виден текст зеркала,
+   каретка и выделение textarea. Шрифтовые настройки обоих слоёв должны
+   совпадать до пикселя, иначе подсветка «уедет». */
+.editorWrapper {
+  position: relative;
   flex: 1;
-  width: 100%;
-  resize: none;
-  border: none;
-  outline: none;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editorMirror {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  overflow: hidden;
   padding: 10px;
   background: var(--app-input-bg);
   color: var(--app-text);
@@ -132,6 +142,37 @@ body {
   font-size: 13px;
   line-height: 1.5;
   tab-size: 2;
+  white-space: pre;
+  pointer-events: none;
+  user-select: none;
+}
+
+.errorHighlight {
+  text-decoration: underline wavy var(--app-danger);
+  text-underline-offset: 3px;
+}
+
+.textarea {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 10px;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--app-text);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  tab-size: 2;
+}
+
+.textarea::selection {
+  background: rgba(79, 156, 249, 0.4);
+  color: transparent;
 }
 
 .errorBanner {
