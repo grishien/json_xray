@@ -13,10 +13,12 @@
   "scripts": {
     "dev": "turbo run dev",
     "dev:www": "turbo run dev --filter=www",
+    "dev:desktop": "turbo run dev --filter=desktop",
     "dev:vscode": "turbo run watch --filter=jsoncrack-vscode",
     "dev:chrome": "turbo run dev --filter=chrome-extension",
     "build": "turbo run build",
     "build:www": "turbo run build --filter=www",
+    "build:desktop": "turbo run build --filter=desktop",
     "build:vscode": "turbo run build --filter=jsoncrack-vscode",
     "build:chrome": "turbo run build --filter=chrome-extension",
     "start": "turbo run start",
