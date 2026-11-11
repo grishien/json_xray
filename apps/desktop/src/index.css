@@ -1,0 +1,151 @@
+/* Глобальные стили JSON Xray (Фаза 3, п. 3.4 roadmap).
+   Тема канваса приходит из jsoncrack-react (jsoncrack-react/style.css),
+   здесь — только «хром» приложения через data-атрибут на корневом узле. */
+
+:root {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+}
+
+.app {
+  --app-bg: #1e1e1e;
+  --app-panel: #252526;
+  --app-border: #3c3c3c;
+  --app-text: #d4d4d4;
+  --app-text-muted: #9da0a6;
+  --app-accent: #4f9cf9;
+  --app-accent-hover: #6fb0fa;
+  --app-danger: #f66;
+  --app-input-bg: #1b1b1b;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+.app[data-theme="light"] {
+  --app-bg: #ffffff;
+  --app-panel: #f4f4f5;
+  --app-border: #d4d4d8;
+  --app-text: #18181b;
+  --app-text-muted: #52525b;
+  --app-accent: #2563eb;
+  --app-accent-hover: #3b82f6;
+  --app-danger: #dc2626;
+  --app-input-bg: #ffffff;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--app-panel);
+  border-bottom: 1px solid var(--app-border);
+  flex: 0 0 auto;
+}
+
+.toolbarTitle {
+  font-weight: 700;
+  margin-right: 12px;
+  user-select: none;
+}
+
+.toolbarSpacer {
+  flex: 1;
+}
+
+.select,
+.button {
+  background: var(--app-input-bg);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.select:focus-visible,
+.button:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 1px;
+}
+
+.buttonPrimary {
+  background: var(--app-accent);
+  border-color: var(--app-accent);
+  color: #fff;
+}
+
+.buttonPrimary:hover {
+  background: var(--app-accent-hover);
+}
+
+.button:hover:not(.buttonPrimary) {
+  border-color: var(--app-text-muted);
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.editorPane {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  min-width: 280px;
+  border-right: 1px solid var(--app-border);
+  background: var(--app-panel);
+}
+
+.textarea {
+  flex: 1;
+  width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 10px;
+  background: var(--app-input-bg);
+  color: var(--app-text);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  tab-size: 2;
+}
+
+.errorBanner {
+  padding: 8px 10px;
+  background: var(--app-input-bg);
+  color: var(--app-danger);
+  border-top: 1px solid var(--app-danger);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 120px;
+  overflow: auto;
+}
+
+.canvasPane {
+  flex: 1;
+  min-width: 0;
+}
