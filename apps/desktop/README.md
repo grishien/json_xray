@@ -32,6 +32,17 @@ apps/desktop/
 - Приложение является членом pnpm-workspace (`apps/*`) и собирается через
   общий Turborepo (`turbo.json`).
 
+## Нативная интеграция (Фаза 5)
+
+- **Открытие/сохранение файлов** — нативные диалоги (`tauri-plugin-dialog`)
+  через кнопки `Open file` / `Save file`; чтение/запись — `tauri-plugin-fs`.
+  Поддерживаются JSON/YAML/XML/CSV, формат определяется по расширению.
+- **Drag-and-drop** — перетащите файл в окно (события `onDragDropEvent`
+  вебвью), откроется первый файл из списка.
+- **Локальность данных (п. 5.3)** — внешние запросы запрещены CSP в
+  `tauri.conf.json` (`connect-src` только `'self'`/ipc); статический контроль
+  бандла: `pnpm check:local` (запускать после `pnpm build`).
+
 ## Команды
 
 Из корня репозитория:
@@ -49,6 +60,8 @@ pnpm build:desktop
 ```sh
 pnpm dev          # только Vite dev-сервер (без окна)
 pnpm build        # tsc + vite build
+pnpm check:local  # проверка бандла на внешние сетевые URL (после build)
+pnpm test         # vitest run (unit + интеграционные тесты)
 pnpm tauri dev    # окно Tauri + Vite (аналог pnpm dev:desktop из корня)
 pnpm tauri build --no-bundle  # portable exe (Фаза 6)
 ```

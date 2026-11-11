@@ -5,10 +5,29 @@
  * html-to-image замокан для экспорта; вся остальная логика — реальная:
  * парсинг/конвертация через contentToJson/jsonToContent, валидация через
  * validateContent, состояние, тема, вызовы ref-методов канваса.
+ * Фаза 5: Tauri-плагины dialog/fs и события вебвью (drag-and-drop)
+ * замоканы на границе @tauri-apps/*; проверяется проводка кнопок Open/Save
+ * и drop-событий на загрузку файла.
  */
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { toJpeg, toPng, toSvg } from "html-to-image";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@tauri-apps/plugin-dialog", () => ({
+  open: vi.fn(),
+  save: vi.fn(),
+}));
+vi.mock("@tauri-apps/plugin-fs", () => ({
+  readTextFile: vi.fn(),
+  writeTextFile: vi.fn(),
+}));
+vi.mock("@tauri-apps/api/webview", () => ({
+  getCurrentWebview: vi.fn(),
+}));
+
+import { open, save } from "@tauri-apps/plugin-dialog";
+import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import { getCurrentWebview } from "@tauri-apps/api/webview";
 
 const canvasState = vi.hoisted(() => ({
   props: null as Record<string, unknown> | null,
@@ -294,5 +313,170 @@ describe("App: экспорт (п. 4.3)", () => {
     const banner = await screen.findByRole("alert");
     expect(banner.textContent).toContain("Canvas not found.");
     expect(toPng).not.toHaveBeenCalled();
+  });
+});
+
+describe("App: открытие/сохранение файлов через нативные диалоги (п. 5.1)", () => {
+  it("opens a file, switches the format, visualizes and shows the file name", async () => {
+    vi.mocked(open).mockResolvedValue("C:\\data\\test.yaml");
+    vi.mocked(readTextFile).mockResolvedValue("name: opened\nrank: 3");
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Open file" }));
+
+    const textarea = await waitFor(() => {
+      const el = screen.getByLabelText("Input data") as HTMLTextAreaElement;
+      expect(el.value).toBe("name: opened\nrank: 3");
+      return el;
+    });
+    expect((screen.getByLabelText("Input format") as HTMLSelectElement).value).toBe("yaml");
+    await waitFor(() => {
+      expect(JSON.parse(screen.getByTestId("canvas-mock").getAttribute("data-json")!)).toEqual({
+        name: "opened",
+        rank: 3,
+      });
+    });
+    expect(screen.getByTitle("C:\\data\\test.yaml").textContent).toBe("test.yaml");
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(textarea).toBeTruthy();
+  });
+
+  it("keeps the input when the open dialog is canceled", async () => {
+    vi.mocked(open).mockResolvedValue(null);
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Open file" }));
+
+    await waitFor(() => expect(open).toHaveBeenCalledTimes(1));
+    expect((screen.getByLabelText("Input data") as HTMLTextAreaElement).value).toBe(SAMPLE_INPUT);
+    expect(readTextFile).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("shows a banner for unsupported file extensions", async () => {
+    vi.mocked(open).mockResolvedValue("C:\\data\\notes.txt");
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Open file" }));
+
+    const banner = await screen.findByRole("alert");
+    expect(banner.textContent).toContain("Unsupported file type");
+    expect(readTextFile).not.toHaveBeenCalled();
+    expect((screen.getByLabelText("Input data") as HTMLTextAreaElement).value).toBe(SAMPLE_INPUT);
+  });
+
+  it("shows a banner when reading the file fails", async () => {
+    vi.mocked(open).mockResolvedValue("C:\\data\\broken.json");
+    vi.mocked(readTextFile).mockRejectedValue(new Error("disk gone"));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Open file" }));
+
+    const banner = await screen.findByRole("alert");
+    expect(banner.textContent).toContain("disk gone");
+  });
+
+  it("saves the input and shows the saved file name", async () => {
+    vi.mocked(save).mockResolvedValue("C:\\out\\data.json");
+    render(<App />);
+    fireEvent.click(screen.getByTestId("save-file"));
+
+    await waitFor(() =>
+      expect(writeTextFile).toHaveBeenCalledWith("C:\\out\\data.json", SAMPLE_INPUT)
+    );
+    await waitFor(() =>
+      expect(screen.getByTitle("C:\\out\\data.json").textContent).toBe("data.json")
+    );
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("does not write when the save dialog is canceled", async () => {
+    vi.mocked(save).mockResolvedValue(null);
+    render(<App />);
+    fireEvent.click(screen.getByTestId("save-file"));
+
+    await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+    expect(writeTextFile).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("shows a banner when saving fails", async () => {
+    vi.mocked(save).mockResolvedValue("C:\\out\\data.json");
+    vi.mocked(writeTextFile).mockRejectedValue(new Error("readonly disk"));
+    render(<App />);
+    fireEvent.click(screen.getByTestId("save-file"));
+
+    const banner = await screen.findByRole("alert");
+    expect(banner.textContent).toContain("readonly disk");
+  });
+});
+
+describe("App: drag-and-drop файлов в окно (п. 5.2)", () => {
+  let dropHandler: ((event: { payload: Record<string, unknown> }) => void) | null;
+  const unlisten = vi.fn();
+
+  const waitSubscribed = async () => {
+    await waitFor(() => expect(dropHandler).not.toBeNull());
+  };
+
+  beforeEach(() => {
+    // isTauriEnv() видит Tauri-окружение — App подписывается на drop-события.
+    (window as unknown as Record<string, unknown>).__TAURI_INTERNALS__ = {};
+    dropHandler = null;
+    unlisten.mockClear();
+    vi.mocked(getCurrentWebview).mockReturnValue({
+      onDragDropEvent: vi.fn(fn => {
+        dropHandler = fn;
+        return unlisten;
+      }),
+    } as never);
+  });
+
+  afterEach(() => {
+    delete (window as unknown as Record<string, unknown>).__TAURI_INTERNALS__;
+  });
+
+  it("shows the overlay while dragging and loads the dropped file", async () => {
+    vi.mocked(readTextFile).mockResolvedValue("id,label\n1,alpha");
+    render(<App />);
+    await waitSubscribed();
+
+    act(() => dropHandler!({ payload: { type: "enter", paths: ["C:\\d\\rows.csv"] } }));
+    expect(screen.getByTestId("drop-overlay")).toBeTruthy();
+
+    act(() => dropHandler!({ payload: { type: "leave" } }));
+    expect(screen.queryByTestId("drop-overlay")).toBeNull();
+
+    act(() => dropHandler!({ payload: { type: "drop", paths: ["C:\\d\\rows.csv"] } }));
+    const textarea = await waitFor(() => {
+      const el = screen.getByLabelText("Input data") as HTMLTextAreaElement;
+      expect(el.value).toBe("id,label\n1,alpha");
+      return el;
+    });
+    expect((screen.getByLabelText("Input format") as HTMLSelectElement).value).toBe("csv");
+    await waitFor(() => {
+      expect(JSON.parse(screen.getByTestId("canvas-mock").getAttribute("data-json")!)).toEqual([
+        { id: 1, label: "alpha" },
+      ]);
+    });
+    expect(screen.getByTitle("C:\\d\\rows.csv")).toBeTruthy();
+    expect(screen.queryByTestId("drop-overlay")).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(textarea).toBeTruthy();
+  });
+
+  it("shows a banner for unsupported dropped files", async () => {
+    render(<App />);
+    await waitSubscribed();
+
+    act(() => dropHandler!({ payload: { type: "drop", paths: ["C:\\d\\notes.txt"] } }));
+    const banner = await screen.findByRole("alert");
+    expect(banner.textContent).toContain("Unsupported file type");
+    expect(readTextFile).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("drop-overlay")).toBeNull();
+  });
+
+  it("unsubscribes from drag-and-drop on unmount", async () => {
+    const view = render(<App />);
+    await waitSubscribed();
+
+    view.unmount();
+    expect(unlisten).toHaveBeenCalledTimes(1);
   });
 });

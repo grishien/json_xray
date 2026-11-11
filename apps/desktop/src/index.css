@@ -73,6 +73,41 @@ body {
   flex: 1;
 }
 
+/* Имя текущего файла после Open/Save (п. 5.1); полный путь — в title. */
+.toolbarPath {
+  color: var(--app-text-muted);
+  font-size: 12px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Оверлей при перетаскивании файла в окно (п. 5.2).
+   pointer-events: none — чтобы не мешать нативному drag-трекингу Tauri. */
+.dropOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--app-bg) 70%, transparent);
+  pointer-events: none;
+}
+
+.dropOverlayCard {
+  padding: 24px 40px;
+  border: 2px dashed var(--app-accent);
+  border-radius: 12px;
+  background: var(--app-panel);
+  color: var(--app-text);
+  font-size: 16px;
+  font-weight: 600;
+  user-select: none;
+}
+
 .select,
 .button {
   background: var(--app-input-bg);
