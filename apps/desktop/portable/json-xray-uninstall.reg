@@ -1,0 +1,38 @@
+Windows Registry Editor Version 5.00
+
+; ============================================================================
+; JSON X-Ray - rollback of json-xray-install.reg (per-user, no admin).
+; ============================================================================
+
+; [1] Remove the whole Applications\json-xray.exe registration
+;     (DefaultIcon, shell\open\command and FriendlyAppName go with it).
+[-HKEY_CURRENT_USER\Software\Classes\Applications\json-xray.exe]
+
+; [2] Remove the custom "Open with JSON X-Ray" verb for each extension
+;     (the command subkey is deleted together with JsonXRay).
+[-HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.json\shell\JsonXRay]
+[-HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.yaml\shell\JsonXRay]
+[-HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.yml\shell\JsonXRay]
+[-HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.xml\shell\JsonXRay]
+[-HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.csv\shell\JsonXRay]
+
+; [3] Remove the folder verb.
+[-HKEY_CURRENT_USER\Software\Classes\Directory\shell\JsonXRay]
+
+; [4] Remove only the "json-xray.exe" value from OpenWithProgids.
+;     The OpenWithProgids key itself is kept on purpose: other apps may
+;     have registered their ProgIDs there too.
+[HKEY_CURRENT_USER\Software\Classes\.json\OpenWithProgids]
+"json-xray.exe"=-
+
+[HKEY_CURRENT_USER\Software\Classes\.yaml\OpenWithProgids]
+"json-xray.exe"=-
+
+[HKEY_CURRENT_USER\Software\Classes\.yml\OpenWithProgids]
+"json-xray.exe"=-
+
+[HKEY_CURRENT_USER\Software\Classes\.xml\OpenWithProgids]
+"json-xray.exe"=-
+
+[HKEY_CURRENT_USER\Software\Classes\.csv\OpenWithProgids]
+"json-xray.exe"=-

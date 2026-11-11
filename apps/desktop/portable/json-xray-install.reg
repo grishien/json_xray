@@ -1,0 +1,126 @@
+Windows Registry Editor Version 5.00
+
+; ============================================================================
+; JSON X-Ray - per-user Explorer integration (portable build, no installer)
+;
+; App    : JSON X-Ray
+; Exe    : json-xray.exe
+; Path   : C:\Tools\json-xray\json-xray.exe   <-- EDIT if installed elsewhere
+; Types  : .json .yaml .yml .xml .csv
+;
+; Notes:
+;  - Everything lives under HKEY_CURRENT_USER\Software\Classes, i.e. the
+;    per-user half of the merged HKEY_CLASSES_ROOT view. This is exactly
+;    where HKCR\SystemFileAssociations\... entries land for the current
+;    user, so no administrator rights are required.
+;  - Default file associations are NOT touched: no (Default) value of any
+;    extension is modified. Only "Open with" entries and a custom verb
+;    are added.
+;  - ".yaml" and ".yml" are registered independently and do not conflict.
+;  - Windows 11: the custom verb appears in the classic context menu
+;    ("Show more options" / Shift+F10). The app itself also shows up in
+;    the modern "Open with" list thanks to the OpenWithProgids entries.
+; ============================================================================
+
+; ----------------------------------------------------------------------------
+; [1] Register the portable exe as a known application ("Open with" dialog
+;     and the "Open with" submenu of the modern Windows 11 context menu).
+;     HKCR equivalent: HKEY_CLASSES_ROOT\Applications\json-xray.exe
+; ----------------------------------------------------------------------------
+[HKEY_CURRENT_USER\Software\Classes\Applications\json-xray.exe]
+@="JSON X-Ray"
+"FriendlyAppName"="JSON X-Ray"
+
+; Icon for the application entry: "C:\Tools\json-xray\json-xray.exe",0
+[HKEY_CURRENT_USER\Software\Classes\Applications\json-xray.exe\DefaultIcon]
+@="\"C:\\Tools\\json-xray\\json-xray.exe\",0"
+
+; Open command: "C:\Tools\json-xray\json-xray.exe" "%1"
+[HKEY_CURRENT_USER\Software\Classes\Applications\json-xray.exe\shell\open\command]
+@="\"C:\\Tools\\json-xray\\json-xray.exe\" \"%1\""
+
+; ----------------------------------------------------------------------------
+; [2] Offer JSON X-Ray in "Open with" for every supported extension.
+;     OpenWithProgids only ADDS a candidate app - it never changes the
+;     default association of the extension.
+; ----------------------------------------------------------------------------
+[HKEY_CURRENT_USER\Software\Classes\.json\OpenWithProgids]
+"json-xray.exe"=""
+
+[HKEY_CURRENT_USER\Software\Classes\.yaml\OpenWithProgids]
+"json-xray.exe"=""
+
+[HKEY_CURRENT_USER\Software\Classes\.yml\OpenWithProgids]
+"json-xray.exe"=""
+
+[HKEY_CURRENT_USER\Software\Classes\.xml\OpenWithProgids]
+"json-xray.exe"=""
+
+[HKEY_CURRENT_USER\Software\Classes\.csv\OpenWithProgids]
+"json-xray.exe"=""
+
+; ----------------------------------------------------------------------------
+; [3] Custom context-menu verb "Open with JSON X-Ray" for supported
+;     extensions.
+;     HKCR equivalent: HKEY_CLASSES_ROOT\SystemFileAssociations\<ext>\shell\JsonXRay
+; ----------------------------------------------------------------------------
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.json\shell\JsonXRay]
+@="Open with JSON X-Ray"
+"MUIVerb"="Open with JSON X-Ray"
+"Icon"="\"C:\\Tools\\json-xray\\json-xray.exe\",0"
+
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.json\shell\JsonXRay\command]
+@="\"C:\\Tools\\json-xray\\json-xray.exe\" \"%1\""
+
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.yaml\shell\JsonXRay]
+@="Open with JSON X-Ray"
+"MUIVerb"="Open with JSON X-Ray"
+"Icon"="\"C:\\Tools\\json-xray\\json-xray.exe\",0"
+
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.yaml\shell\JsonXRay\command]
+@="\"C:\\Tools\\json-xray\\json-xray.exe\" \"%1\""
+
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.yml\shell\JsonXRay]
+@="Open with JSON X-Ray"
+"MUIVerb"="Open with JSON X-Ray"
+"Icon"="\"C:\\Tools\\json-xray\\json-xray.exe\",0"
+
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.yml\shell\JsonXRay\command]
+@="\"C:\\Tools\\json-xray\\json-xray.exe\" \"%1\""
+
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.xml\shell\JsonXRay]
+@="Open with JSON X-Ray"
+"MUIVerb"="Open with JSON X-Ray"
+"Icon"="\"C:\\Tools\\json-xray\\json-xray.exe\",0"
+
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.xml\shell\JsonXRay\command]
+@="\"C:\\Tools\\json-xray\\json-xray.exe\" \"%1\""
+
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.csv\shell\JsonXRay]
+@="Open with JSON X-Ray"
+"MUIVerb"="Open with JSON X-Ray"
+"Icon"="\"C:\\Tools\\json-xray\\json-xray.exe\",0"
+
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\.csv\shell\JsonXRay\command]
+@="\"C:\\Tools\\json-xray\\json-xray.exe\" \"%1\""
+
+; ----------------------------------------------------------------------------
+; [4] Optional: open a folder as a source of files (right-click a folder).
+;     HKCR equivalent: HKEY_CLASSES_ROOT\Directory\shell\JsonXRay
+;     To show the item only while holding Shift, add a line:
+;       "Extended"=hex(0):
+;     To also add it to the menu of empty space inside a folder, add:
+;       [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\JsonXRay]
+;       @="Open with JSON X-Ray"
+;       "MUIVerb"="Open with JSON X-Ray"
+;       "Icon"="\"C:\\Tools\\json-xray\\json-xray.exe\",0"
+;       [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\JsonXRay\command]
+;       @="\"C:\\Tools\\json-xray\\json-xray.exe\" \"%V\""
+; ----------------------------------------------------------------------------
+[HKEY_CURRENT_USER\Software\Classes\Directory\shell\JsonXRay]
+@="Open with JSON X-Ray"
+"MUIVerb"="Open with JSON X-Ray"
+"Icon"="\"C:\\Tools\\json-xray\\json-xray.exe\",0"
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\shell\JsonXRay\command]
+@="\"C:\\Tools\\json-xray\\json-xray.exe\" \"%1\""

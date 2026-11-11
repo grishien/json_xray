@@ -21,6 +21,10 @@ describe("локальность данных: CSP без сети (п. 5.3)", (
     expect(csp!.length).toBeGreaterThan(0);
     // Базовое ограничение: всё только со «своего» источника.
     expect(csp).toContain("default-src 'self'");
+    // ELK-раскладка канваса (reaflow) создаёт Web Worker из data:-URL.
+    // Без worker-src CSP падает до default-src 'self', воркер блокируется,
+    // onLayoutChange не наступает — «вечный спиннер» в упакованном приложении.
+    expect(csp).toMatch(/worker-src[^;]*\bdata:/);
     // IPC Tauri (invoke диалогов/фс) остаётся разрешён.
     expect(csp).toContain("ipc:");
     expect(csp).toContain("http://ipc.localhost");
@@ -34,6 +38,8 @@ describe("локальность данных: CSP без сети (п. 5.3)", (
 
     expect(typeof devCsp).toBe("string");
     expect(devCsp).toContain("default-src 'self'");
+    // См. комментарий в production-тесте: ELK-воркер требует worker-src data:.
+    expect(devCsp).toMatch(/worker-src[^;]*\bdata:/);
     expect(devCsp).toContain("http://localhost:1420");
     expect(devCsp).toContain("ws://localhost:1421");
     expect(devCsp).toContain("http://ipc.localhost");
