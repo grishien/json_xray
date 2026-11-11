@@ -40,3 +40,16 @@ Desktop.ini
 .env
 .env.*
 !.env.example
+
+# ===== JSON Crack (upstream monorepo) =====
+.agents
+.claude
+.codex
+skills-lock.json
+.npm-cache/
+.pnp*
+.turbo/
+**/.next/
+**/out/
+**/coverage/
+**/*.tsbuildinfo

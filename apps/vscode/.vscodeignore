@@ -1,0 +1,16 @@
+.vscode/**
+.vscode-test/**
+.github/**
+.turbo/**
+node_modules/**
+src/**
+ext-src/**
+.gitignore
+.prettierignore
+.prettierrc
+index.html
+vite.config.ts
+esbuild.config.mjs
+eslint.config.mjs
+**/tsconfig.json
+**/*.map
