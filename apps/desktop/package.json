@@ -10,7 +10,8 @@
     "tauri": "tauri",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:local": "node scripts/check-local-only.mjs"
+    "check:local": "node scripts/check-local-only.mjs",
+    "check:portable": "node scripts/check-portable.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

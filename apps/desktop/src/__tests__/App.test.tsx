@@ -480,3 +480,61 @@ describe("App: drag-and-drop файлов в окно (п. 5.2)", () => {
     expect(unlisten).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("App: чек-лист MVP (п. 6.3 roadmap)", () => {
+  it("passes the full chain: open file → visualize → edit → convert → export", async () => {
+    // 1. Открыть файл через нативный диалог.
+    vi.mocked(open).mockResolvedValue("C:\\mvp\\config.yaml");
+    vi.mocked(readTextFile).mockResolvedValue("service: xray\nreplicas: 2");
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Open file" }));
+
+    const textarea = await waitFor(() => {
+      const el = screen.getByLabelText("Input data") as HTMLTextAreaElement;
+      expect(el.value).toBe("service: xray\nreplicas: 2");
+      return el;
+    });
+    expect((screen.getByLabelText("Input format") as HTMLSelectElement).value).toBe("yaml");
+
+    // 2. Файл визуализирован: граф получил распарсенный JSON.
+    await waitFor(() => {
+      expect(JSON.parse(screen.getByTestId("canvas-mock").getAttribute("data-json")!)).toEqual({
+        service: "xray",
+        replicas: 2,
+      });
+    });
+
+    // 3. Отредактировать: изменить данные и пере-визуализировать.
+    fireEvent.change(textarea, {
+      target: { value: "service: xray\nreplicas: 5\nfeatures:\n  - graph" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Visualize" }));
+    await waitFor(() => {
+      expect(JSON.parse(screen.getByTestId("canvas-mock").getAttribute("data-json")!)).toEqual({
+        service: "xray",
+        replicas: 5,
+        features: ["graph"],
+      });
+    });
+
+    // 4. Конвертировать YAML → JSON (двусторонняя конвертация, п. 4.2).
+    fireEvent.change(screen.getByLabelText("Convert to"), { target: { value: "json" } });
+    await waitFor(() => {
+      const el = screen.getByLabelText("Input data") as HTMLTextAreaElement;
+      expect(JSON.parse(el.value)).toEqual({
+        service: "xray",
+        replicas: 5,
+        features: ["graph"],
+      });
+    });
+    expect((screen.getByLabelText("Input format") as HTMLSelectElement).value).toBe("json");
+
+    // 5. Экспортировать визуализацию в PNG (п. 4.3).
+    fireEvent.click(screen.getByRole("button", { name: "Export PNG" }));
+    await waitFor(() => expect(toPng).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(clickSpy).toHaveBeenCalled());
+    const anchor = clickSpy.mock.instances[0] as unknown as HTMLAnchorElement;
+    expect(anchor.download).toBe("json-xray.png");
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+});
